@@ -1,0 +1,15 @@
+1) Nokačāt HD m3u8
+wget https://as2.filmas.lv/FilmasLV/05785D4D7B8C5562C6EB98CDB3F5EFD6/index-f3-v1-a1.m3u8
+
+2) Dabūt key (labāk ar firefox, tur var dabūt base64)
+https://www.filmas.lv/lmdb/hls/key/server/AB149980C0933B6ABC192DAE122A3D37
+
+Dekodēt
+https://base64.guru/converter/decode/file
+
+saglabāt kā application.bin
+
+3) Izmainīt key URI="application.bin"
+
+4)
+ffmpeg -allowed_extensions ALL -protocol_whitelist file,http,https,tcp,tls,crypto -i index-f3-v1-a1.m3u8 -c copy video.ts
