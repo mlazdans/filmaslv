@@ -3,14 +3,17 @@
 error_reporting(E_ALL);
 ini_set('max_execution_time', 0);
 
-if($argc < 2){
-	print "Usage: $argv[0] <MovieID>\n";
+$A = getopt("i::", [], $rest);
+$MovieID = $argv[$rest]??0;
+
+if(!$MovieID){
+	print "Usage: $argv[0] [-i] <MovieID>\n";
+	print "\t-i parādīt tikai info\n";
 	exit(1);
 }
 
-$MovieID = $argv[1];
+$ShowInfo = isset($A['i']);
 
-$DEV = false;
 $MainURL = "https://www.filmas.lv/movie/$MovieID/";
 //$agent = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.87 Safari/537.36';
 $agent = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:62.0) Gecko/20100101 Firefox/62.0';
@@ -26,15 +29,7 @@ curl_setopt($cu, CURLOPT_COOKIEJAR, tempnam('', 'coo'));
 curl_setopt($cu, CURLOPT_FOLLOWLOCATION, true);
 
 function cget($cu, $url){
-	global $DEV;
-
-	if($DEV){
-		return file_get_contents($url);
-	}
-
-	// sleep(1);
 	curl_setopt($cu, CURLOPT_URL, $url);
-
 	return curl_exec($cu);
 }
 
@@ -66,8 +61,6 @@ function get_best_playlist($cu, $PlaylistURL){
 		exit(1);
 	}
 
-	print "PL=$PlaylistURL!\n";
-
 	$PlaylistHTML = preg_split("/\r\n|\n|\r/", $PlaylistHTML);
 
 	$max = -1;
@@ -88,7 +81,6 @@ function get_best_playlist($cu, $PlaylistURL){
 	return $BestURL;
 }
 
-if($DEV)$MainURL = "url/main.htm";
 if(!($HTML = cget($cu, $MainURL))){
 	print "Nevar ielādēt $MainURL\n";
 	exit(1);
@@ -112,58 +104,57 @@ $play_list_f = tempnam('', 'ply');
 file_put_contents($main_f, $HTML);
 
 # Key request
-if(!$DEV){
-	$KeyReqURL = "https://www.filmas.lv/lmdb/hls/key/request/$MovieID?".time();
-	print "Key request: $KeyReqURL\n";
-	cget($cu, $KeyReqURL);
+$KeyReqURL = "https://www.filmas.lv/lmdb/hls/key/request/$MovieID?".time();
+print "Key request: $KeyReqURL\n";
+cget($cu, $KeyReqURL);
 
-	$KeyReqURL = "https://www.filmas.lv/lmdb/hls/key/request/$MovieID?".time();
-	print "2nd key request: $KeyReqURL\n";
-	cget($cu, $KeyReqURL);
-}
+$KeyReqURL = "https://www.filmas.lv/lmdb/hls/key/request/$MovieID?".time();
+print "2nd key request: $KeyReqURL\n";
+cget($cu, $KeyReqURL);
 
 $Source = null;
 //lmdb.video_src = "/lmdb/hls/playlist/314D1B939C3AB0904089247C4E7066CC.m3u8";
 if(preg_match('/(\/lmdb\/hls\/playlist\/([A-Z0-9]*)\.m3u8)/', $HTML, $m)){
 	$Source = 'filmaslv';
-	if($DEV){
-		$BestURL = get_best_playlist($cu, "url/$MovieID.m3u8");
-	} else {
-		$BestURL = get_best_playlist($cu, "https://www.filmas.lv".$m[1]);
-	}
+	$PL = "https://www.filmas.lv".$m[1];
+	$BestURL = get_best_playlist($cu, $PL);
 //lmdb.video_src = "https://ff0000.latnet.media/FilmasLV/Liekam_but_,540p,240p,720p,1080p,.mp4.urlset/master.m3u8";
 } elseif(preg_match('/(https?:\/\/.*latnet\.media\/FilmasLV\/.*\/)master\.m3u8/', $HTML, $m)){
 	$Source = 'latnet';
+	$PL = $m[0];
 	$SourceURL = $m[1];
-	if($DEV){
-		$BestURL = get_best_playlist($cu, "url/$MovieID.m3u8");
-	} else {
-		$BestURL = $SourceURL.get_best_playlist($cu, $m[0]);
-	}
+	$BestURL = $SourceURL.get_best_playlist($cu, $PL);
 //lmdb.video_src = "https://as2cdn.azureedge.net/Filmas/vanadzins_,512Kbps_360p,360Kbps_240p,1000Kbps_480p,2500Kbps_720p,_filmasLV.mp4.urlset/master.m3u8";
 } elseif(preg_match('/(https?:\/\/.*azureedge\.net\/Filmas\/.*\/)master\.m3u8/', $HTML, $m)){
 	$Source = 'azure';
+	$PL = $m[0];
 	$SourceURL = $m[1];
-	$BestURL = $SourceURL.get_best_playlist($cu, $m[0]);
+	$BestURL = $SourceURL.get_best_playlist($cu, $PL);
 //lmdb.trailer_src = "https://as2.filmas.lv/Trailers/,Diendusa_fragments.mov,.mp4.urlset/master.m3u8";
 } elseif(preg_match('/(https?:\/\/.*\.filmas.lv\/Trailers\/.*\/)master\.m3u8/', $HTML, $m)){
 	$Source = 'trailers';
+	$PL = $m[0];
 	$SourceURL = $m[1];
-	$BestURL = get_best_playlist($cu, $m[0]);
+	$BestURL = get_best_playlist($cu, $PL);
 } else {
-	print $HTML;
 	print "Nevar sameklēt playlist\n";
 	exit(1);
 }
 
+print "Playlist URL: $PL!\n";
+print "Pieejamie playlist:\n".trim(cget($cu, $PL))."\n";
+
 if($BestURL){
-	print "Labākās kvalitātes playlist:\n$BestURL\n\n";
+	print "Labākās kvalitātes playlist: $BestURL\n";
 } else {
 	print "Nevar sameklēt labāko playlist\n";
 	exit(1);
 }
 
-if($DEV)$BestURL = "url/index-f4-v1-a1.m3u8";
+if($ShowInfo){
+	exit;
+}
+
 if(!($PlaylistHTML = cget($cu, $BestURL))){
 	print "Nevar ielādēt $BestURL\n";
 	exit(1);
@@ -210,8 +201,6 @@ if($KeyURL){
 	print "Nevar sameklēt KEY URL\n";
 	exit(1);
 }
-
-if($DEV)$KeyURL = "url/key";
 
 if($KEY = cget($cu, $KeyURL)){
 	// Iespējams binary
