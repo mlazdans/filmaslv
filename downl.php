@@ -166,6 +166,9 @@ if($KeyURL){
 	exit(1);
 }
 
+# NOTE: test, ja nav uzstādīts $MovieID
+curl_setopt($cu, CURLOPT_REFERER, "https://www.filmas.lv/movie/$MovieID/");
+
 if($KEY = cget($cu, $KeyURL)){
 	// Iespējams binary
 	if(strlen($KEY) == 16){
