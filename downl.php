@@ -38,8 +38,8 @@ if($MovieID){
 		exit(1);
 	}
 
-	//<meta name="title" content="Baltu Ciltis (2018)" />
-	//<meta name="title" content="Lidojam!? Cikls "Munks un Lemijs" (1994)" />
+	# <meta name="title" content="Baltu Ciltis (2018)" />
+	# <meta name="title" content="Lidojam!? Cikls "Munks un Lemijs" (1994)" />
 	if(preg_match('/meta\s+name="title"\s+content="(.*)" \/>/i', $HTML, $m)){
 		$MovieName = $m[1];
 	}
@@ -58,27 +58,27 @@ if($MovieID){
 }
 
 $Source = null;
-//lmdb.video_src = "/lmdb/hls/playlist/314D1B939C3AB0904089247C4E7066CC.m3u8";
+# lmdb.video_src = "/lmdb/hls/playlist/314D1B939C3AB0904089247C4E7066CC.m3u8";
 if(preg_match('/(\/lmdb\/hls\/playlist\/([A-Z0-9]*)\.m3u8)/', $Hey, $m)){
 	$Source = 'filmaslv';
 	$PL = "https://www.filmas.lv".$m[1];
 	$TempName = $m[2];
 	$BestURL = get_best_playlist($cu, $PL);
-//lmdb.video_src = "https://ff0000.latnet.media/FilmasLV/Liekam_but_,540p,240p,720p,1080p,.mp4.urlset/master.m3u8";
+# lmdb.video_src = "https://ff0000.latnet.media/FilmasLV/Liekam_but_,540p,240p,720p,1080p,.mp4.urlset/master.m3u8";
 } elseif(preg_match('/(https?:\/\/.*latnet\.media\/FilmasLV\/(.*)\/)master\.m3u8/', $Hey, $m)){
 	$Source = 'latnet';
 	$PL = $m[0];
 	$SourceURL = $m[1];
 	$TempName = $m[2];
 	$BestURL = $SourceURL.get_best_playlist($cu, $PL);
-//lmdb.video_src = "https://as2cdn.azureedge.net/Filmas/vanadzins_,512Kbps_360p,360Kbps_240p,1000Kbps_480p,2500Kbps_720p,_filmasLV.mp4.urlset/master.m3u8";
+# lmdb.video_src = "https://as2cdn.azureedge.net/Filmas/vanadzins_,512Kbps_360p,360Kbps_240p,1000Kbps_480p,2500Kbps_720p,_filmasLV.mp4.urlset/master.m3u8";
 } elseif(preg_match('/(https?:\/\/.*azureedge\.net\/Filmas\/(.*)\/)master\.m3u8/', $Hey, $m)){
 	$Source = 'azure';
 	$PL = $m[0];
 	$SourceURL = $m[1];
 	$TempName = $m[2];
 	$BestURL = $SourceURL.get_best_playlist($cu, $PL);
-//lmdb.trailer_src = "https://as2.filmas.lv/Trailers/,Diendusa_fragments.mov,.mp4.urlset/master.m3u8";
+# lmdb.trailer_src = "https://as2.filmas.lv/Trailers/,Diendusa_fragments.mov,.mp4.urlset/master.m3u8";
 } elseif(preg_match('/(https?:\/\/.*\.filmas.lv\/Trailers\/(.*)\/)master\.m3u8/', $Hey, $m)){
 	$Source = 'trailers';
 	$PL = $m[0];
@@ -170,7 +170,6 @@ if($KeyURL){
 curl_setopt($cu, CURLOPT_REFERER, "https://www.filmas.lv/movie/$MovieID/");
 
 if($KEY = cget($cu, $KeyURL)){
-	// Iespējams binary
 	if(strlen($KEY) == 16){
 		print "KEY: [binary] (iespējams)\n";
 	} else {
