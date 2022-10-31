@@ -65,7 +65,8 @@ if(preg_match('/(\/lmdb\/hls\/playlist\/([A-Z0-9]*)\.m3u8)/', $Hey, $m)){
 	$TempName = $m[2];
 	$BestURL = get_best_playlist($cu, $PL);
 # lmdb.video_src = "https://ff0000.latnet.media/FilmasLV/Liekam_but_,540p,240p,720p,1080p,.mp4.urlset/master.m3u8";
-} elseif(preg_match('/(https?:\/\/.*latnet\.media\/FilmasLV\/(.*)\/)master\.m3u8/', $Hey, $m)){
+# lmdb.video_src = "https://as2lv.filmas.lv/FilmasLV/hlsnkc/,20221025/0/0_qfr8jsoz_0_5o9d4zdj_2.mp4,20221025/0/0_qfr8jsoz_0_85zi16cr_2.mp4,20221025/0/0_qfr8jsoz_0_wghgcwpz_12.mp4,.urlset/master.m3u8";
+} elseif(preg_match('/(https?:\/\/.*\/FilmasLV\/(.*)\/)master\.m3u8/', $Hey, $m)){
 	$Source = 'latnet';
 	$PL = $m[0];
 	$SourceURL = $m[1];
