@@ -162,30 +162,28 @@ for($i = 1; $i < count($PlaylistHTML); $i++){
 
 if($KeyURL){
 	print "KEY URL:\n$KeyURL\n\n";
+	if($KEY = cget($cu, $KeyURL)){
+		if(strlen($KEY) == 16){
+			print "KEY: [binary] (iespējams)\n";
+		} else {
+			print "KEY: $KEY\n";
+			$KEY = base64_decode($KEY);
+		}
+	} else {
+		print "Nevar ielādēt $KeyURL\n";
+		exit(1);
+	}
+
+	if(false === file_put_contents($key_f, $KEY)){
+		print "Nevar saglabāt KEY ($key_f)\n";
+		exit(1);
+	}
 } else {
-	print "Nevar sameklēt KEY URL\n";
-	exit(1);
+	print "Nevar sameklēt KEY URL. Mēģinām bez!\n";
 }
 
 # NOTE: test, ja nav uzstādīts $MovieID
 curl_setopt($cu, CURLOPT_REFERER, "https://www.filmas.lv/movie/$MovieID/");
-
-if($KEY = cget($cu, $KeyURL)){
-	if(strlen($KEY) == 16){
-		print "KEY: [binary] (iespējams)\n";
-	} else {
-		print "KEY: $KEY\n";
-		$KEY = base64_decode($KEY);
-	}
-} else {
-	print "Nevar ielādēt $KeyURL\n";
-	exit(1);
-}
-
-if(false === file_put_contents($key_f, $KEY)){
-	print "Nevar saglabāt KEY ($key_f)\n";
-	exit(1);
-}
 
 $play_list_f = tempnam('', 'ply');
 if(false === file_put_contents($play_list_f, join("\n", $PlaylistHTML))){
