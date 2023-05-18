@@ -17,7 +17,7 @@ if(!$MovieID && !$PlayListURL){
 	exit(1);
 }
 
-$agent = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:62.0) Gecko/20100101 Firefox/62.0';
+$agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36';
 
 $cu = curl_init();
 curl_setopt($cu, CURLOPT_SSL_VERIFYPEER, false);
@@ -28,6 +28,23 @@ curl_setopt($cu, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($cu, CURLOPT_USERAGENT, $agent);
 curl_setopt($cu, CURLOPT_COOKIEJAR, tempnam('', 'coo'));
 curl_setopt($cu, CURLOPT_FOLLOWLOCATION, true);
+
+curl_setopt($cu, CURLOPT_HTTPHEADER, [
+	'Accept: */*',
+	// 'Accept-Encoding: gzip, deflate, br',
+	'Accept-Language: en-US,en;q=0.9,lv;q=0.8',
+	// 'Connection: keep-alive',
+	// 'Host: as2.filmas.lv',
+	'Origin: https://www.filmas.lv',
+	'Referer: https://www.filmas.lv/',
+	'Sec-Fetch-Dest: empty',
+	'Sec-Fetch-Mode: cors',
+	'Sec-Fetch-Site: same-site',
+	// 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36',
+	'sec-ch-ua: "Google Chrome";v="113", "Chromium";v="113", "Not-A.Brand";v="24"',
+	'sec-ch-ua-mobile: ?0',
+	'sec-ch-ua-platform: "Windows"',
+]);
 
 $MovieName = '';
 if($MovieID){
