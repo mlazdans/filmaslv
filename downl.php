@@ -102,7 +102,7 @@ if(!$MovieName){
 
 $MovieName = mb_ereg_replace("([^\w\s\d\-_~,;\[\]\(\).])", '', $MovieName);
 $MovieName = mb_ereg_replace("([\.]{2,})", '', $MovieName);
-$MovieName = mb_convert_encoding($MovieName, "ISO-8859-13");
+$MovieName = mb_convert_encoding($MovieName, "UTF-8");
 
 print "Faila nosaukums: $MovieName\n";
 
